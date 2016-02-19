@@ -3,6 +3,7 @@ import com.haxepunk.graphics.Tilemap;
 import com.haxepunk.utils.Key;
 import com.haxepunk.utils.Input;
 import com.haxepunk.utils.Draw;
+import com.haxepunk.graphics.Image.createRect;
 
 class MainScene extends Scene {
 	var tiles:Tilemap;
@@ -11,28 +12,32 @@ class MainScene extends Scene {
 		Input.define("Next", [Key.ENTER]);
 		tiles = new Tilemap("graphics/tile.png", 640, 480, 20, 20);
 		changes = new Array<Change>();
-
-		tiles.setTile(5, 6, 0);
-		tiles.setTile(6, 6, 0);
-		tiles.setTile(4, 6, 0);
-		tiles.setTile(6, 5, 0);
-		tiles.setTile(5, 4, 0);
+		
 		addGraphic(tiles, 0, 0, 0);
 		drawGrid();
 	}
 
 	public function drawGrid():Void {
-		
+		for ( x in 0 ... tiles.columns ) 
+			addGraphic(createRect(1, 480, 0xa7a0c3, .5), 0, x * 20, 0);
+		for ( y in 0 ... tiles.rows )
+			addGraphic(createRect(640, 1, 0xa7a0c3, .5), 0, 0, y * 20);
 	}
 
 	public override function update():Void {
 		super.update();
 		if ( Input.mousePressed )
-			tiles.setTile(getColumn(), getRow());
+			flipTile();
 		if ( Input.pressed("Next") ) {
 			applyRules();
 			makeChanges();
 		}
+	}
+
+	public function flipTile():Void {
+		if ( tiles.getTile(getColumn(), getRow()) == 0 )
+			tiles.clearTile(getColumn(), getRow());
+		else tiles.setTile(getColumn(), getRow());
 	}
 
 	public function applyRules():Void {
